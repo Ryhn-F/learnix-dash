@@ -6,9 +6,11 @@ const firebaseConfigStr = process.env.FIREBASE_CONFIG || "{}";
 
 try {
   const firebaseConfig = JSON.parse(firebaseConfigStr);
+
   app = initializeApp(firebaseConfig);
 } catch (error) {
   console.warn(
+    error,
     "Failed to parse FIREBASE_CONFIG. Firebase will be minimally initialized.",
   );
   app = !getApps().length ? initializeApp({}) : getApp();
