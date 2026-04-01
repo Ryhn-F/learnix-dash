@@ -4,22 +4,34 @@ import {
   query,
   orderBy,
   getDocs,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db, hasFirebaseConfig } from "../lib/firebase/firebase";
 import { ChatMessage, ChatSession } from "../types/chat";
-import { v4 as uuidv4 } from "uuid";
 
 export class ChatService {
   static async createSession(
-    topic: string = "General Learning",
+    userId: string,
+    topic: string,
   ): Promise<ChatSession> {
-    const session: ChatSession = {
-      id: uuidv4(),
-      topic,
-      messages: [],
-      createdAt: Date.now(),
-    };
-    return session;
+    try {
+      const docRef = await addDoc(collection(db, "chats"), {
+        userId: userId,
+        topic: topic,
+        createdAt: serverTimestamp(),
+      });
+
+      const session: ChatSession = {
+        id: docRef.id,
+        topic,
+        messages: [],
+        createdAt: Date.now(),
+      };
+      return session;
+    } catch (e: any) {
+      console.log(e);
+      throw new Error("Firebase Error", e.message);
+    }
   }
 
   static async getSessionMessages(sessionId: string): Promise<ChatMessage[]> {

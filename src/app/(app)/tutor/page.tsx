@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChatMessage as IChatMessage } from "@/types/chat";
+import { ChatSession, ChatMessage as IChatMessage } from "@/types/chat";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ChatInput } from "@/components/chat/chat-input";
 import { v4 as uuidv4 } from "uuid";
@@ -17,13 +17,49 @@ export default function TutorPage() {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionObj, setSessionObj] = useState(null);
-  const [sessionId, setSessionId] = useState("");
+  const [sessionObj, setSessionObj] = useState<ChatSession | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const createSession = async () => {
+    try {
+      const userData = {
+        userId: "1",
+        username: "Rayhan",
+      };
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      const RetrievedData = localStorage.getItem("user");
+      const userObj = RetrievedData ? JSON.parse(RetrievedData) : null;
+      const response = await fetch("api/create-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userObj.userId,
+          topic: "general",
+        }),
+      });
+
+      const result = await response.json();
+      console.log(result.data);
+      setSessionObj(result.data);
+      console.log(sessionObj);
+      setSessionId(result.data.id);
+      console.log(sessionId);
+
+      return result.data;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    setSessionId(uuidv4());
+    createSession();
   }, []);
+
+  useEffect(() => {
+    console.log("Session Updated : ", sessionId);
+  }, [sessionId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -34,8 +70,12 @@ export default function TutorPage() {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
+    if (!sessionId) {
+      console.warn("session create masih loading Todo : tar ganti loading");
+      return;
+    }
     const userMsg: IChatMessage = {
-      id: uuidv4(),
+      id: sessionId,
       role: "user",
       content,
       timestamp: Date.now(),
