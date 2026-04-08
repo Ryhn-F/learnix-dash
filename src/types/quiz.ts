@@ -27,9 +27,11 @@ export interface QuizGenerateRequest {
   topic: string;
   difficulty: "easy" | "medium" | "hard";
   numQuestions: number;
+  userId: string;
 }
 
 export interface QuizSubmitRequest {
+  userId: string;
   topic: string;
   score: number;
   total_questions: number;

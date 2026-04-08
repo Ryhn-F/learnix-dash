@@ -17,3 +17,12 @@ export interface ChatRequest {
   message: string;
   topic: string;
 }
+
+// Supabase sessions_chat record
+export interface SessionChatRecord {
+  id: string;
+  session_id: string;
+  user_id: string;
+  chat_title?: string;
+  created_at?: string;
+}

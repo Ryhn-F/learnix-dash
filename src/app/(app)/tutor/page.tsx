@@ -1,65 +1,29 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChatSession, ChatMessage as IChatMessage } from "@/types/chat";
+import { useRouter } from "next/navigation";
+import { ChatMessage as IChatMessage } from "@/types/chat";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ChatInput } from "@/components/chat/chat-input";
 import { v4 as uuidv4 } from "uuid";
+import { Sparkles, MessageSquareText, AlertCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function TutorPage() {
-  const [messages, setMessages] = useState<IChatMessage[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content:
-        "Hi! I'm your Learnix AI Tutor. What would you like to learn about today? You can ask me to explain any topic from basic math to advanced physics.",
-      timestamp: Date.now(),
-    },
-  ]);
+  const router = useRouter();
+  const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionObj, setSessionObj] = useState<ChatSession | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const createSession = async () => {
-    try {
-      const userData = {
-        userId: "1",
-        username: "Rayhan",
-      };
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      const RetrievedData = localStorage.getItem("user");
-      const userObj = RetrievedData ? JSON.parse(RetrievedData) : null;
-      const response = await fetch("api/create-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: userObj.userId,
-          topic: "general",
-        }),
-      });
-
-      const result = await response.json();
-      console.log(result.data);
-      setSessionObj(result.data);
-      console.log(sessionObj);
-      setSessionId(result.data.id);
-      console.log(sessionId);
-
-      return result.data;
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  useEffect(() => {
-    createSession();
-  }, []);
-
-  useEffect(() => {
-    console.log("Session Updated : ", sessionId);
-  }, [sessionId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -70,94 +34,140 @@ export default function TutorPage() {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
-    if (!sessionId) {
-      console.warn("session create masih loading Todo : tar ganti loading");
-      return;
-    }
-    const userMsg: IChatMessage = {
-      id: sessionId,
-      role: "user",
-      content,
-      timestamp: Date.now(),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
-    setIsLoading(true);
+    if (isCreatingSession) return;
+    setIsCreatingSession(true);
 
     try {
-      const response = await fetch("/api/ai/chat", {
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 12000); // 12s timeout
+
+      // Get user from localStorage
+      const stored = localStorage.getItem("user");
+      if (!stored) {
+        clearTimeout(timeoutId);
+        router.push("/login");
+        return;
+      }
+      const user = JSON.parse(stored);
+
+      // 1. Create Firebase session via existing create-session API
+      const createRes = await fetch("/api/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId,
-          message: content,
-          topic: "General",
-          history: messages,
+          userId: user.id,
+          topic: "general",
         }),
+        signal: abortController.signal,
       });
 
-      const data = await response.json();
+      if (!createRes.ok) throw new Error("API returned an error");
 
-      if (response.ok) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: uuidv4(),
-            role: "assistant",
-            content: data.result || "Sorry, I couldn't generate a response.",
-            timestamp: Date.now(),
-          },
-        ]);
+      const createResult = await createRes.json();
+      const firebaseSessionId = createResult.data.id;
+
+      // 2. Save session reference to Supabase sessions_chat table
+      const supabaseRes = await fetch("/api/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: firebaseSessionId,
+          userId: user.id,
+          firstMessage: content,
+        }),
+        signal: abortController.signal,
+      });
+
+      if (!supabaseRes.ok) throw new Error("API returned an error connecting to DB");
+
+      clearTimeout(timeoutId);
+
+      // 3. Navigate to the session page and pass the first message via query param
+      const encodedMessage = encodeURIComponent(content);
+      router.push(`/tutor/${firebaseSessionId}?firstMessage=${encodedMessage}`);
+    } catch (e: any) {
+      console.error("Failed to create session:", e);
+      setIsCreatingSession(false);
+      
+      if (e.name === "AbortError" || e.message === "AbortError") {
+        setErrorMessage("The AI Tutor is taking too long to respond. This might happen if the AI server is busy or your connection is slow. Please try again.");
       } else {
-        throw new Error(data.error);
+        setErrorMessage("Failed to start a new chat session. Please verify your connection and try again.");
       }
-    } catch (error) {
-      console.error(error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: uuidv4(),
-          role: "assistant",
-          content:
-            "**Error:** Sorry, there was an issue processing your request. Please try again.",
-          timestamp: Date.now(),
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
+      setShowErrorModal(true);
     }
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">AI Tutor</h1>
-        <p className="text-muted-foreground mt-1">
-          Chat naturally to understand any topic deeply.
-        </p>
-      </div>
-
+    <div className="flex flex-col h-full">
+      {/* Chat area or empty state */}
       <div className="flex-1 overflow-hidden bg-card border rounded-2xl shadow-sm flex flex-col relative">
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
-          {messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg} />
-          ))}
-          {isLoading && (
-            <div className="flex gap-4 p-4 rounded-xl bg-card border w-32 items-center justify-center">
-              <div className="flex space-x-1.5 animate-pulse">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <div className="w-2 h-2 bg-purple-500 rounded-full animation-delay-200"></div>
-                <div className="w-2 h-2 bg-purple-500 rounded-full animation-delay-400"></div>
-              </div>
+        {messages.length === 0 ? (
+          /* Empty State — New Chat Welcome */
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 mb-6">
+              <Sparkles className="w-8 h-8 text-white" />
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">
+              AI Tutor
+            </h2>
+            <p className="text-muted-foreground text-center max-w-md mb-8">
+              Start a new conversation to learn about any topic. Ask questions
+              and get clear, easy-to-understand explanations.
+            </p>
 
+            {/* Suggestion chips */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg w-full">
+              {[
+                "Explain quantum computing simply",
+                "How does photosynthesis work?",
+                "Teach me about neural networks",
+                "What is the theory of relativity?",
+              ].map((suggestion, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSendMessage(suggestion)}
+                  disabled={isCreatingSession}
+                  className="flex items-center gap-3 p-3 rounded-xl border bg-background hover:bg-muted text-sm text-left transition-all hover:shadow-sm group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <MessageSquareText className="w-4 h-4 text-purple-500 flex-shrink-0 group-hover:text-purple-600 transition-colors" />
+                  <span className="truncate">{suggestion}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+            {messages.map((msg) => (
+              <ChatMessage key={msg.id} message={msg} />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+
+        {/* Input */}
         <div className="p-4 border-t bg-background">
-          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading || isCreatingSession}
+          />
         </div>
       </div>
+
+      <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="w-5 h-5" />
+              Connection Failed
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-base py-2 text-foreground">
+            {errorMessage}
+          </DialogDescription>
+          <DialogFooter showCloseButton />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

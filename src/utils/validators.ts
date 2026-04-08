@@ -19,4 +19,5 @@ export const GenerateQuizInputSchema = z.object({
   topic: z.string().min(2),
   difficulty: z.enum(["easy", "medium", "hard"]).default("medium"),
   numQuestions: z.number().min(1).max(10).default(5),
+  userId: z.string().nullable().optional(),
 });

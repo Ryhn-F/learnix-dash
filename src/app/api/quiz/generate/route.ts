@@ -7,6 +7,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validated = GenerateQuizInputSchema.parse(body);
 
+    console.log(`[Quiz Generate API] topic="${validated.topic}", difficulty="${validated.difficulty}", numQuestions=${validated.numQuestions}, userId=${validated.userId || "anonymous"}`);
+
     const quiz = await AIService.generateQuiz(
       validated.topic,
       validated.difficulty,
@@ -15,7 +17,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, quiz });
   } catch (error: any) {
-    console.error("Generate Quiz Error:", error);
+    console.error("Generate Quiz Error:", error.message);
     return NextResponse.json(
       { success: false, error: error.message || "Internal server error" },
       { status: error.errors ? 400 : 500 }

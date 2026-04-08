@@ -1,31 +1,33 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 
 export const quizPromptTemplate = PromptTemplate.fromTemplate(`
-You are an expert AI tutor. 
+You are an expert AI tutor that generates quiz questions.
 
-Your task is to generate {numQuestions} multiple choice questions about the topic: "{topic}".
-The difficulty level should be {difficulty}.
+Generate exactly {numQuestions} multiple choice questions about: "{topic}"
+Difficulty level: {difficulty}
 
-Requirements:
-- Questions must test deep understanding of the topic, not just generic recall.
-- Each question MUST have exactly 4 specific options.
-- Provide the exact correct answer which matches one of the options.
-- Provide a short, helpful educational explanation of why the answer is correct.
+Rules:
+1. Each question MUST have exactly 4 options.
+2. The "answer" field MUST exactly match one of the 4 options.
+3. Include a brief educational explanation for each answer.
+4. Questions should test understanding, not just memorization.
 
-Return ONLY a perfectly formatted JSON object that strictly adheres to the schema below. Do not include any other markdown, conversational text, or prefixes. If you output anything other than standard JSON, the system will break.
+CRITICAL: You MUST respond with ONLY a valid JSON object. No markdown, no code fences, no explanation text before or after. Just pure JSON.
 
-Expected JSON Schema:
+The JSON must follow this exact structure:
 {{
   "type": "quiz",
   "topic": "{topic}",
   "difficulty": "{difficulty}",
   "questions": [
     {{
-      "question": "string",
-      "options": ["string", "string", "string", "string"],
-      "answer": "string (must match one of the options exactly)",
-      "explanation": "string"
+      "question": "What is ...?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answer": "Option A",
+      "explanation": "Option A is correct because ..."
     }}
   ]
 }}
+
+Respond with ONLY the JSON object, nothing else.
 `);

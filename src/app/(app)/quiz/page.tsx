@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Brain, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Quiz, QuizQuestion } from "@/types/quiz";
+import { Quiz } from "@/types/quiz";
 import { QuizCard } from "@/components/quiz/quiz-card";
 import { QuizResults } from "@/components/quiz/quiz-results";
 
@@ -15,24 +15,41 @@ export default function QuizPage() {
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
   const [numQuestions, setNumQuestions] = useState(5);
+  const [userId, setUserId] = useState<string | null>(null);
   
   const [quizState, setQuizState] = useState<QuizState>("idle");
   const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [generateError, setGenerateError] = useState<string | null>(null);
   
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get user from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      try {
+        const user = JSON.parse(stored);
+        setUserId(user.id);
+      } catch {
+        console.warn("Failed to parse user from localStorage");
+      }
+    }
+  }, []);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!topic.trim()) return;
 
     setQuizState("generating");
+    setGenerateError(null);
     
     try {
       const response = await fetch("/api/quiz/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, difficulty, numQuestions }),
+        body: JSON.stringify({ topic, difficulty, numQuestions, userId }),
       });
       
       const data = await response.json();
@@ -43,9 +60,9 @@ export default function QuizPage() {
       setQuizState("active");
       setUserAnswers({});
       setCurrentQuestionIdx(0);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to generate quiz", error);
-      alert("Failed to generate quiz. Please try again or check API keys.");
+      setGenerateError(error.message || "Failed to generate quiz. Please try again.");
       setQuizState("idle");
     }
   };
@@ -65,30 +82,31 @@ export default function QuizPage() {
   };
 
   const submitQuiz = async () => {
-    if (!quiz) return;
+    if (!quiz || isSubmitting) return;
     
+    setIsSubmitting(true);
     let score = 0;
     quiz.questions.forEach((q, idx) => {
       if (userAnswers[idx] === q.answer) score++;
     });
 
     try {
-      // We send dummy userId since we don't have auth yet
       await fetch("/api/quiz/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: "anonymous",
+          userId: userId || "anonymous",
           topic: quiz.topic,
           score,
           questions: quiz.questions
         })
       });
     } catch (e) {
-      console.warn("Could not save to DB (likely no credentials)", e);
+      console.warn("Could not save to DB", e);
+    } finally {
+      setIsSubmitting(false);
+      setQuizState("results");
     }
-
-    setQuizState("results");
   };
 
   const calculateScore = () => {
@@ -111,6 +129,14 @@ export default function QuizPage() {
             <h1 className="text-3xl font-bold tracking-tight mb-2">Generate a Practice Quiz</h1>
             <p className="text-muted-foreground">Pick any topic and let AI create a custom test for you.</p>
           </div>
+
+          {/* Error message */}
+          {generateError && (
+            <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm animate-in fade-in slide-in-from-top-2 duration-300">
+              <p className="font-medium mb-1">Failed to generate quiz</p>
+              <p className="opacity-80">{generateError}</p>
+            </div>
+          )}
 
           <Card className="border shadow-sm rounded-2xl overflow-hidden">
             <CardContent className="p-6 md:p-8">
@@ -188,9 +214,16 @@ export default function QuizPage() {
               size="lg" 
               className="px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-transform active:scale-95"
               onClick={handleNext}
-              disabled={!userAnswers[currentQuestionIdx]}
+              disabled={!userAnswers[currentQuestionIdx] || isSubmitting}
             >
-              {currentQuestionIdx < quiz.questions.length - 1 ? "Next Question" : "Finish Quiz"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                currentQuestionIdx < quiz.questions.length - 1 ? "Next Question" : "Finish Quiz"
+              )}
             </Button>
           </div>
         </div>
@@ -209,6 +242,7 @@ export default function QuizPage() {
           onNewQuiz={() => {
             setQuizState("idle");
             setTopic("");
+            setGenerateError(null);
           }}
         />
       )}
