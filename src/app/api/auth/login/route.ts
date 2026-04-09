@@ -37,17 +37,34 @@ export async function POST(request: Request) {
     // Return user data (exclude password)
     const { password: _, ...safeUser } = user;
 
-    return NextResponse.json(
+    const token = Buffer.from(`${safeUser.id}:${safeUser.email}-${Date.now()}`).toString('base64');
+
+    const response = NextResponse.json(
       {
         data: {
-          id: safeUser.id,
-          name: safeUser.name,
-          email: safeUser.email,
+          token,
+          userinfo: {
+            id: safeUser.id,
+            name: safeUser.name,
+            email: safeUser.email,
+          }
         },
         message: "Login successful",
       },
       { status: 200 }
     );
+
+    // Set cookie for middleware
+    response.cookies.set({
+      name: 'token',
+      value: token,
+      httpOnly: false, // so they could read it if they wanted
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+
+    return response;
   } catch (e: unknown) {
     console.error("Login error:", e);
     return NextResponse.json(

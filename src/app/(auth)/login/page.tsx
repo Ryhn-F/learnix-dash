@@ -42,7 +42,10 @@ export default function LoginPage() {
       }
 
       // Store user data in localStorage
-      localStorage.setItem("user", JSON.stringify(result.data));
+      localStorage.setItem("user", JSON.stringify(result.data.userinfo));
+      localStorage.setItem("userinfo", JSON.stringify(result.data.userinfo));
+      localStorage.setItem("token", result.data.token);
+      
       router.push("/dashboard");
     } catch {
       setError("Something went wrong. Please try again.");
