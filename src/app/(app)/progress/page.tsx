@@ -80,7 +80,7 @@ export default function ProgressPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <main className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight mb-2">
@@ -292,6 +292,6 @@ export default function ProgressPage() {
           </Card>
         )}
       </div>
-    </div>
+    </main>
   );
 }

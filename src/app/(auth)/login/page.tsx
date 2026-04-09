@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Sparkles, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,6 +170,13 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">Don&apos;t have an account? </span>
+              <Link href="/register" className="font-semibold text-purple-600 hover:text-purple-500 transition-colors">
+                Sign up
+              </Link>
+            </div>
           </CardContent>
         </Card>
 
