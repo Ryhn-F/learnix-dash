@@ -119,7 +119,7 @@ export default function QuizPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-10rem)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <main className="min-h-[calc(100vh-10rem)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
       {quizState === "idle" && (
         <div className="max-w-2xl mx-auto w-full mt-10">
           <div className="text-center mb-8">
@@ -246,6 +246,6 @@ export default function QuizPage() {
           }}
         />
       )}
-    </div>
+    </main>
   );
 }

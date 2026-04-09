@@ -99,7 +99,7 @@ export default function TutorPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <main className="flex flex-col h-full">
       {/* Chat area or empty state */}
       <div className="flex-1 overflow-hidden bg-card border rounded-2xl shadow-sm flex flex-col relative">
         {messages.length === 0 ? (
@@ -168,6 +168,6 @@ export default function TutorPage() {
           <DialogFooter showCloseButton />
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }

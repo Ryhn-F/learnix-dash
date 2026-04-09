@@ -55,7 +55,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
+    <main className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
       {/* Animated background orbs */}
       <div className="absolute top-[-30%] left-[-15%] w-[60%] h-[60%] bg-purple-500/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
       <div className="absolute bottom-[-25%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/15 rounded-full blur-[120px] pointer-events-none animate-pulse" />
@@ -177,6 +177,6 @@ export default function LoginPage() {
           Powered by Gemini AI · Built with Next.js
         </p>
       </div>
-    </div>
+    </main>
   );
 }
