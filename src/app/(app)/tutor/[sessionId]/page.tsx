@@ -149,13 +149,13 @@ export default function ChatSessionPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden bg-card border rounded-2xl shadow-sm flex flex-col relative">
+      <div className="flex-1 overflow-hidden bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 flex flex-col relative z-10">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
           {isLoadingHistory ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
-              <span className="ml-3 text-muted-foreground text-sm">
+              <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+              <span className="ml-3 text-white/50 text-sm">
                 Loading conversation...
               </span>
             </div>
@@ -165,11 +165,11 @@ export default function ChatSessionPage() {
                 <ChatMessage key={msg.id || idx} message={msg} />
               ))}
               {isLoading && (
-                <div className="flex gap-4 p-4 rounded-xl bg-card border w-32 items-center justify-center">
+                <div className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/10 w-32 items-center justify-center">
                   <div className="flex space-x-1.5 animate-pulse">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <div className="w-2 h-2 bg-purple-500 rounded-full animation-delay-200"></div>
-                    <div className="w-2 h-2 bg-purple-500 rounded-full animation-delay-400"></div>
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full animation-delay-200"></div>
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full animation-delay-400"></div>
                   </div>
                 </div>
               )}
@@ -179,7 +179,7 @@ export default function ChatSessionPage() {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t bg-background">
+        <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md rounded-b-3xl">
           <ChatInput
             onSendMessage={handleSendMessage}
             isLoading={isLoading || isLoadingHistory}

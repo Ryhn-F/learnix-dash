@@ -3,7 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, MessageSquare, Clock, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  MessageSquare,
+  Clock,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SessionChatRecord } from "@/types/chat";
@@ -25,7 +32,9 @@ export default function TutorLayout({
       if (!stored) return;
       const user = JSON.parse(stored);
 
-      const response = await fetch(`/api/sessions?userId=${user.id}`, { cache: "no-store" });
+      const response = await fetch(`/api/sessions?userId=${user.id}`, {
+        cache: "no-store",
+      });
       const result = await response.json();
 
       if (response.ok && result.data) {
@@ -63,17 +72,17 @@ export default function TutorLayout({
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] gap-4 animate-in fade-in duration-500">
+    <div className="flex h-[calc(100vh-10rem)] gap-4">
       {/* Chat History Sidebar */}
       <div
         className={`${
           isCollapsed ? "w-12" : "w-72"
-        } flex-shrink-0 bg-card border rounded-2xl shadow-sm flex flex-col overflow-hidden transition-all duration-300`}
+        } flex-shrink-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl shadow-indigo-500/5 flex flex-col overflow-hidden transition-all duration-300`}
       >
         {/* Sidebar Header */}
-        <div className="p-3 border-b flex items-center justify-between gap-2">
+        <div className="p-3 border-b border-white/10 flex items-center justify-between gap-2">
           {!isCollapsed && (
-            <h3 className="text-sm font-semibold text-foreground truncate">
+            <h3 className="text-sm font-semibold text-white/90 truncate">
               Chat History
             </h3>
           )}
@@ -83,7 +92,7 @@ export default function TutorLayout({
                 variant="ghost"
                 size="icon-xs"
                 onClick={() => router.push("/tutor")}
-                className="text-purple-600 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/30"
+                className="text-indigo-400 hover:text-indigo-300 hover:bg-white/10"
                 title="New Chat"
               >
                 <Plus className="w-4 h-4" />
@@ -93,7 +102,7 @@ export default function TutorLayout({
               variant="ghost"
               size="icon-xs"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-white/50 hover:text-white hover:bg-white/10"
               title={isCollapsed ? "Expand" : "Collapse"}
             >
               {isCollapsed ? (
@@ -112,7 +121,7 @@ export default function TutorLayout({
               variant="ghost"
               size="icon-xs"
               onClick={() => router.push("/tutor")}
-              className="text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/30"
+              className="text-indigo-400 hover:bg-white/10"
               title="New Chat"
             >
               <Plus className="w-4 h-4" />
@@ -124,15 +133,13 @@ export default function TutorLayout({
             <div className="p-2 space-y-1">
               {isLoadingSessions ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="w-5 h-5 animate-spin text-white/40" />
                 </div>
               ) : sessions.length === 0 ? (
                 <div className="text-center py-8 px-3">
-                  <MessageSquare className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="text-xs text-muted-foreground">
-                    No chats yet
-                  </p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">
+                  <MessageSquare className="w-8 h-8 text-white/20 mx-auto mb-3" />
+                  <p className="text-xs text-white/50">No chats yet</p>
+                  <p className="text-xs text-white/30 mt-1">
                     Start a new conversation!
                   </p>
                 </div>
@@ -141,10 +148,10 @@ export default function TutorLayout({
                   <Link
                     key={session.id}
                     href={`/tutor/${session.session_id}`}
-                    className={`flex items-start gap-3 px-3 py-2.5 rounded-xl transition-all group ${
+                    className={`flex items-start gap-3 px-3 py-2.5 rounded-xl transition-all group overflow-hidden ${
                       isActiveSession(session.session_id)
-                        ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 shadow-[0_0_12px_rgba(99,102,241,0.1)]"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />

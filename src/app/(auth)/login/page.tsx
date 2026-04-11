@@ -14,6 +14,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { staggerContainer, fadeUp, scaleIn } from "@/components/motion/variants";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -56,135 +58,146 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
+    <main className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-[#050816] via-[#090a1f] to-[#020617] text-white">
       {/* Animated background orbs */}
-      <div className="absolute top-[-30%] left-[-15%] w-[60%] h-[60%] bg-purple-500/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-[-25%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/15 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-      <div className="absolute top-[50%] left-[60%] w-[30%] h-[30%] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse" />
-
-      {/* Subtle grid overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
+      <motion.div 
+        animate={{ y: [0, -30, 0], opacity: [0.1, 0.2, 0.1] }} 
+        transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+        className="absolute top-[-20%] left-[-15%] w-[60%] h-[60%] bg-indigo-600 rounded-full blur-[140px] pointer-events-none" 
+      />
+      <motion.div 
+        animate={{ y: [0, 30, 0], opacity: [0.1, 0.2, 0.1] }} 
+        transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
+        className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600 rounded-full blur-[140px] pointer-events-none" 
       />
 
-      <div className="z-10 w-full max-w-md px-4">
+      <motion.div 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="z-10 w-full max-w-md px-4 relative"
+      >
         {/* Logo Section */}
-        <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-lg shadow-purple-500/25 mb-6">
-            <Sparkles className="w-8 h-8 text-white" />
+        <motion.div variants={fadeUp} className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border border-white/10 shadow-lg shadow-purple-500/20 mb-6 drop-shadow-xl">
+            <Sparkles className="w-8 h-8 text-indigo-400" />
           </div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-indigo-500">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
             Learnix
           </h1>
-          <p className="text-muted-foreground mt-2 text-sm">
+          <p className="text-white/60 mt-2 text-sm font-medium">
             AI-Powered Learning Platform
           </p>
-        </div>
+        </motion.div>
 
         {/* Login Card */}
-        <Card className="border-border/50 bg-card/80 backdrop-blur-xl shadow-2xl shadow-purple-500/5 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold tracking-tight">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Sign in with your name or email
-            </CardDescription>
-          </CardHeader>
+        <motion.div variants={scaleIn}>
+          <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl shadow-indigo-500/10 rounded-3xl overflow-hidden">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-2xl font-bold tracking-tight text-white">
+                Welcome back
+              </CardTitle>
+              <CardDescription className="text-white/60">
+                Sign in with your name or email
+              </CardDescription>
+            </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-5">
-              {/* Error Alert */}
-              {error && (
-                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-300">
-                  {error}
-                </div>
-              )}
+            <CardContent>
+              <form onSubmit={handleLogin} className="space-y-5">
+                {/* Error Alert */}
+                {error && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold"
+                  >
+                    {error}
+                  </motion.div>
+                )}
 
-              {/* Identifier Field */}
-              <div className="space-y-2">
-                <Label htmlFor="login-identifier" className="text-sm font-medium">
-                  Name or Email
-                </Label>
-                <Input
-                  id="login-identifier"
-                  type="text"
-                  placeholder="Enter your name or email"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  className="h-11 rounded-xl bg-background/50 border-border/60 focus-visible:border-purple-500 focus-visible:ring-purple-500/20 transition-all"
-                />
-              </div>
-
-              {/* Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="login-password" className="text-sm font-medium">
-                  Password
-                </Label>
-                <div className="relative">
+                {/* Identifier Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="login-identifier" className="text-sm font-medium text-white/80">
+                    Name or Email
+                  </Label>
                   <Input
-                    id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    id="login-identifier"
+                    type="text"
+                    placeholder="Enter your name or email"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="h-11 rounded-xl bg-background/50 border-border/60 focus-visible:border-purple-500 focus-visible:ring-purple-500/20 pr-11 transition-all"
+                    className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:border-indigo-400/50 focus-visible:ring-indigo-400/40 transition-all font-medium"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
                 </div>
+
+                {/* Password Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="login-password" className="text-sm font-medium text-white/80">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={isLoading}
+                      className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:border-indigo-400/50 focus-visible:ring-indigo-400/40 transition-all font-medium pr-11"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isLoading || !identifier.trim() || !password.trim()}
+                  className="w-full h-12 mt-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 relative overflow-hidden group border-0 border-white/10"
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                  <span className="relative flex items-center justify-center gap-2">
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign in"
+                    )}
+                  </span>
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center text-sm font-medium">
+                <span className="text-white/50">Don&apos;t have an account? </span>
+                <Link href="/register" className="text-indigo-400 hover:text-indigo-300 transition-colors ml-1">
+                  Sign up
+                </Link>
               </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={isLoading || !identifier.trim() || !password.trim()}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-300"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign in"
-                )}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Don&apos;t have an account? </span>
-              <Link href="/register" className="font-semibold text-purple-600 hover:text-purple-500 transition-colors">
-                Sign up
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground mt-6 animate-in fade-in duration-700 delay-300">
+        <motion.p variants={fadeUp} className="text-center text-xs text-white/40 mt-8 font-medium">
           Powered by Gemini AI · Built with Next.js
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </main>
   );
 }

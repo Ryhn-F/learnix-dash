@@ -1,6 +1,10 @@
 import { supabase } from "@/lib/supabase/supabase";
 import { NextResponse } from "next/server";
 
+export async function GET(request: Request) {
+  return NextResponse.json({ message: "Login API is working" });
+}
+
 export async function POST(request: Request) {
   try {
     const { identifier, password } = await request.json();

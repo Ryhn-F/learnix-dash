@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Quiz } from "@/types/quiz";
 import { QuizCard } from "@/components/quiz/quiz-card";
 import { QuizResults } from "@/components/quiz/quiz-results";
+import { motion } from "framer-motion";
+import { staggerContainer, fadeUp, scaleIn } from "@/components/motion/variants";
 
 type QuizState = "idle" | "generating" | "active" | "results";
 
@@ -119,33 +121,38 @@ export default function QuizPage() {
   };
 
   return (
-    <main className="min-h-[calc(100vh-10rem)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <motion.main 
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className="min-h-[calc(100vh-10rem)] flex flex-col"
+    >
       {quizState === "idle" && (
-        <div className="max-w-2xl mx-auto w-full mt-10">
+        <motion.div variants={fadeUp} className="max-w-2xl mx-auto w-full mt-10">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/5 shadow-lg shadow-purple-500/10">
               <Brain size={32} />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">Generate a Practice Quiz</h1>
-            <p className="text-muted-foreground">Pick any topic and let AI create a custom test for you.</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 text-white">Generate a Practice Quiz</h1>
+            <p className="text-white/60">Pick any topic and let AI create a custom test for you.</p>
           </div>
 
           {/* Error message */}
           {generateError && (
-            <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm animate-in fade-in slide-in-from-top-2 duration-300">
+            <motion.div variants={scaleIn} className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
               <p className="font-medium mb-1">Failed to generate quiz</p>
               <p className="opacity-80">{generateError}</p>
-            </div>
+            </motion.div>
           )}
 
-          <Card className="border shadow-sm rounded-2xl overflow-hidden">
+          <Card className="border-white/10 shadow-xl shadow-indigo-500/10 rounded-2xl overflow-hidden bg-white/5 backdrop-blur-md">
             <CardContent className="p-6 md:p-8">
               <form onSubmit={handleGenerate} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">What do you want to learn about?</label>
+                  <label className="text-sm font-medium text-white/80">What do you want to learn about?</label>
                   <Input 
                     placeholder="e.g. Photosynthesis, World War 2, Next.js Routing..." 
-                    className="h-14 px-4 rounded-xl text-lg bg-background"
+                    className="h-14 px-4 rounded-xl text-lg bg-white/5 text-white border-white/10 focus-visible:ring-indigo-400/40 focus-visible:border-indigo-400/50 placeholder:text-white/30 transition-all"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     required
@@ -154,9 +161,9 @@ export default function QuizPage() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                     <label className="text-sm font-medium">Difficulty</label>
+                     <label className="text-sm font-medium text-white/80">Difficulty</label>
                      <select 
-                       className="flex h-12 w-full items-center justify-between rounded-xl border bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       className="flex h-12 w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-400/50 transition-all appearance-none [&>option]:bg-[#090a1f]"
                        value={difficulty}
                        onChange={(e) => setDifficulty(e.target.value as any)}
                      >
@@ -166,9 +173,9 @@ export default function QuizPage() {
                      </select>
                   </div>
                   <div className="space-y-2">
-                     <label className="text-sm font-medium">Questions</label>
+                     <label className="text-sm font-medium text-white/80">Questions</label>
                      <select 
-                       className="flex h-12 w-full items-center justify-between rounded-xl border bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       className="flex h-12 w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-400/50 transition-all appearance-none [&>option]:bg-[#090a1f]"
                        value={numQuestions}
                        onChange={(e) => setNumQuestions(Number(e.target.value))}
                      >
@@ -181,7 +188,7 @@ export default function QuizPage() {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-14 rounded-xl text-lg font-semibold bg-purple-600 hover:bg-purple-700 text-white mt-4"
+                  className="w-full h-14 rounded-xl text-lg font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white mt-4 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] transition-all duration-300 border-0"
                   disabled={!topic.trim()}
                 >
                   Generate Quiz
@@ -189,19 +196,19 @@ export default function QuizPage() {
               </form>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       )}
 
       {quizState === "generating" && (
-        <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-          <Loader2 className="w-16 h-16 animate-spin text-purple-600" />
-          <h2 className="text-2xl font-bold">Creating your quiz...</h2>
-          <p className="text-muted-foreground">Analyzing the topic and generating challenging questions.</p>
-        </div>
+        <motion.div variants={fadeUp} className="flex-1 flex flex-col items-center justify-center space-y-6">
+          <Loader2 className="w-16 h-16 animate-spin text-purple-400" />
+          <h2 className="text-2xl font-bold text-white">Creating your quiz...</h2>
+          <p className="text-white/60">Analyzing the topic and generating challenging questions.</p>
+        </motion.div>
       )}
 
       {quizState === "active" && quiz && (
-        <div className="flex-1 flex flex-col items-center justify-center mt-10 w-full animate-in fade-in zoom-in-95 duration-300">
+        <motion.div variants={scaleIn} className="flex-1 flex flex-col items-center justify-center mt-10 w-full relative z-10">
           <QuizCard
             question={quiz.questions[currentQuestionIdx]}
             currentNumber={currentQuestionIdx + 1}
@@ -212,7 +219,7 @@ export default function QuizPage() {
           <div className="mt-8 flex justify-end w-full max-w-2xl px-2">
             <Button 
               size="lg" 
-              className="px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-transform active:scale-95"
+              className="px-8 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:scale-[1.05] text-white font-medium shadow-lg shadow-indigo-500/20 transition-all border-0"
               onClick={handleNext}
               disabled={!userAnswers[currentQuestionIdx] || isSubmitting}
             >
@@ -226,26 +233,28 @@ export default function QuizPage() {
               )}
             </Button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {quizState === "results" && quiz && (
-        <QuizResults
-          questions={quiz.questions}
-          userAnswers={userAnswers}
-          score={calculateScore()}
-          onRetry={() => {
-            setQuizState("active");
-            setUserAnswers({});
-            setCurrentQuestionIdx(0);
-          }}
-          onNewQuiz={() => {
-            setQuizState("idle");
-            setTopic("");
-            setGenerateError(null);
-          }}
-        />
+        <motion.div variants={fadeUp} className="flex-1 w-full">
+          <QuizResults
+            questions={quiz.questions}
+            userAnswers={userAnswers}
+            score={calculateScore()}
+            onRetry={() => {
+              setQuizState("active");
+              setUserAnswers({});
+              setCurrentQuestionIdx(0);
+            }}
+            onNewQuiz={() => {
+              setQuizState("idle");
+              setTopic("");
+              setGenerateError(null);
+            }}
+          />
+        </motion.div>
       )}
-    </main>
+    </motion.main>
   );
 }

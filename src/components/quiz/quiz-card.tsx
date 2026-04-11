@@ -18,12 +18,12 @@ export function QuizCard({
   onSelectOption,
 }: QuizCardProps) {
   return (
-    <Card className="w-full max-w-2xl mx-auto border shadow-sm">
+    <Card className="w-full max-w-2xl mx-auto border-white/10 bg-white/5 backdrop-blur-md shadow-xl shadow-indigo-500/10 rounded-2xl">
       <CardHeader>
-        <div className="text-sm text-muted-foreground font-medium mb-2 uppercase tracking-wider">
+        <div className="text-sm text-white/50 font-medium mb-2 uppercase tracking-wider">
           Question {currentNumber} of {totalQuestions}
         </div>
-        <CardTitle className="text-xl md:text-2xl font-bold leading-tight">
+        <CardTitle className="text-xl md:text-2xl font-bold leading-tight text-white">
           {question.question}
         </CardTitle>
       </CardHeader>
@@ -34,15 +34,15 @@ export function QuizCard({
             <Button
               key={idx}
               variant="outline"
-              className={`w-full justify-start text-left h-auto py-4 px-6 rounded-xl transition-all ${
+              className={`w-full justify-start text-left h-auto py-4 px-6 rounded-xl transition-all border ${
                 isSelected
-                  ? "border-purple-500 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 ring-1 ring-purple-500"
-                  : "hover:border-purple-300 hover:bg-purple-50/50 dark:hover:bg-purple-900/10"
+                  ? "border-indigo-400/50 bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/30 shadow-[0_0_12px_rgba(99,102,241,0.15)]"
+                  : "border-white/10 bg-white/5 text-white/80 hover:border-indigo-400/30 hover:bg-white/10"
               }`}
               onClick={() => onSelectOption(option)}
             >
               <div className="flex gap-4 w-full">
-                <span className="font-bold shrink-0 text-muted-foreground">
+                <span className={`font-bold shrink-0 ${isSelected ? "text-indigo-400" : "text-white/40"}`}>
                   {String.fromCharCode(65 + idx)}.
                 </span>
                 <span className="whitespace-pre-wrap">{option}</span>
@@ -54,3 +54,4 @@ export function QuizCard({
     </Card>
   );
 }
+
