@@ -88,7 +88,14 @@ export default function ChatSessionPage() {
       router.replace(`/tutor/${sessionId}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firstMessage, hasProcessedFirstMessage, isLoadingHistory, isNewSession, sessionId, router]);
+  }, [
+    firstMessage,
+    hasProcessedFirstMessage,
+    isLoadingHistory,
+    isNewSession,
+    sessionId,
+    router,
+  ]);
 
   const handleSendMessage = async (content: string) => {
     if (!sessionId) return;
@@ -148,43 +155,41 @@ export default function ChatSessionPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 flex flex-col relative z-10">
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
-          {isLoadingHistory ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
-              <span className="ml-3 text-white/50 text-sm">
-                Loading conversation...
-              </span>
-            </div>
-          ) : (
-            <>
-              {messages.map((msg, idx) => (
-                <ChatMessage key={msg.id || idx} message={msg} />
-              ))}
-              {isLoading && (
-                <div className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/10 w-32 items-center justify-center">
-                  <div className="flex space-x-1.5 animate-pulse">
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full animation-delay-200"></div>
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full animation-delay-400"></div>
-                  </div>
+    <div className="relative">
+      {/* Messages — flows with the main scrollbar */}
+      <div className="p-4 md:p-6 space-y-6 pb-28">
+        {isLoadingHistory ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+            <span className="ml-3 text-white/50 text-sm">
+              Loading conversation...
+            </span>
+          </div>
+        ) : (
+          <>
+            {messages.map((msg, idx) => (
+              <ChatMessage key={msg.id || idx} message={msg} />
+            ))}
+            {isLoading && (
+              <div className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/10 w-32 items-center justify-center">
+                <div className="flex space-x-1.5 animate-pulse">
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full animation-delay-200"></div>
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full animation-delay-400"></div>
                 </div>
-              )}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
 
-        {/* Input */}
-        <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md rounded-b-3xl">
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading || isLoadingHistory}
-          />
-        </div>
+      {/* Input — fixed at bottom like a navbar */}
+      <div className="sticky bottom-0 z-20 p-4 border-t border-white/15 bg-gradient-to-b from-[#05081686] via-[#090a1f] to-[#020617] backdrop-blur-xl rounded-3xl">
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          isLoading={isLoading || isLoadingHistory}
+        />
       </div>
     </div>
   );

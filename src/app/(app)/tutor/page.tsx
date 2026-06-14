@@ -100,7 +100,7 @@ export default function TutorPage() {
   return (
     <main className="flex flex-col h-full">
       {/* Chat area or empty state */}
-      <div className="flex-1 overflow-hidden bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 flex flex-col relative z-10">
+      <div className="overflow-hidden  flex flex-col relative z-10 h-[80vh]">
         {messages.length === 0 ? (
           /* Empty State — New Chat Welcome */
           <motion.div
@@ -154,7 +154,7 @@ export default function TutorPage() {
         )}
 
         {/* Input */}
-        <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md rounded-b-3xl">
+        <div className="p-4  border-white/10 bg-gradient-to-b from-[#050816] via-[#090a1f] to-[#020617] backdrop-blur-md rounded-3xl">
           <ChatInput
             onSendMessage={handleSendMessage}
             isLoading={isLoading || isCreatingSession}
