@@ -27,14 +27,6 @@ export default function TutorPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const handleSendMessage = async (content: string) => {
     if (isCreatingSession) return;
     setIsCreatingSession(true);
@@ -80,7 +72,8 @@ export default function TutorPage() {
         signal: abortController.signal,
       });
 
-      if (!supabaseRes.ok) throw new Error("API returned an error connecting to DB");
+      if (!supabaseRes.ok)
+        throw new Error("API returned an error connecting to DB");
 
       clearTimeout(timeoutId);
 
@@ -90,11 +83,15 @@ export default function TutorPage() {
     } catch (e: any) {
       console.error("Failed to create session:", e);
       setIsCreatingSession(false);
-      
+
       if (e.name === "AbortError" || e.message === "AbortError") {
-        setErrorMessage("The AI Tutor is taking too long to respond. This might happen if the AI server is busy or your connection is slow. Please try again.");
+        setErrorMessage(
+          "The AI Tutor is taking too long to respond. This might happen if the AI server is busy or your connection is slow. Please try again.",
+        );
       } else {
-        setErrorMessage("Failed to start a new chat session. Please verify your connection and try again.");
+        setErrorMessage(
+          "Failed to start a new chat session. Please verify your connection and try again.",
+        );
       }
       setShowErrorModal(true);
     }
@@ -106,7 +103,12 @@ export default function TutorPage() {
       <div className="flex-1 overflow-hidden bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 flex flex-col relative z-10">
         {messages.length === 0 ? (
           /* Empty State — New Chat Welcome */
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="flex-1 flex flex-col items-center justify-center p-8">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="flex-1 flex flex-col items-center justify-center p-8"
+          >
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20 mb-6">
               <Sparkles className="w-8 h-8 text-white" />
             </div>
@@ -133,7 +135,9 @@ export default function TutorPage() {
                   className="flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-sm text-left transition-all hover:shadow-lg shadow-indigo-500/10 group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <MessageSquareText className="w-4 h-4 text-indigo-400 flex-shrink-0 group-hover:text-indigo-300 transition-colors" />
-                  <span className="truncate text-white/80 group-hover:text-white transition-colors">{suggestion}</span>
+                  <span className="truncate text-white/80 group-hover:text-white transition-colors">
+                    {suggestion}
+                  </span>
                 </button>
               ))}
             </div>
