@@ -100,7 +100,8 @@ export default function QuizPage() {
           userId: userId || "anonymous",
           topic: quiz.topic,
           score,
-          questions: quiz.questions
+          questions: quiz.questions,
+          userAnswers,
         })
       });
     } catch (e) {

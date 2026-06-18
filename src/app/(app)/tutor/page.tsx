@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef} from "react";
 import { useRouter } from "next/navigation";
 import { ChatMessage as IChatMessage } from "@/types/chat";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ChatInput } from "@/components/chat/chat-input";
-import { v4 as uuidv4 } from "uuid";
 import { Sparkles, MessageSquareText, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeUp } from "@/components/motion/variants";

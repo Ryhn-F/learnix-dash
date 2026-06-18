@@ -10,6 +10,7 @@ import {
   Brain,
   TrendingUp,
   Loader2,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -207,6 +208,7 @@ export default function ProgressPage() {
                   <th className="px-6 py-4 font-semibold">Score</th>
                   <th className="px-6 py-4 font-semibold">Accuracy</th>
                   <th className="px-6 py-4 font-semibold">Date</th>
+                  <th className="px-6 py-4 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <motion.tbody variants={staggerContainer} initial="hidden" animate="visible" className="divide-y divide-white/5">
@@ -244,6 +246,16 @@ export default function ProgressPage() {
                       <td className="px-6 py-4 text-white/40 text-xs font-medium">
                         {formatDate(record.created_at)}
                       </td>
+                      <td className="px-6 py-4 text-right">
+                        <Link href={`/progress/detail/${record.id}`}>
+                          <button
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/20 hover:shadow-[0_0_12px_rgba(99,102,241,0.2)] transition-all duration-200"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </Link>
+                      </td>
                     </motion.tr>
                   );
                 })}
@@ -279,9 +291,19 @@ export default function ProgressPage() {
                           {record.score}/{record.total_questions}
                         </span>
                       </span>
-                      <span className="text-xs">
-                        {formatDate(record.created_at)}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs">
+                          {formatDate(record.created_at)}
+                        </span>
+                        <Link href={`/progress/detail/${record.id}`}>
+                          <button
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/20 hover:shadow-[0_0_12px_rgba(99,102,241,0.2)] transition-all duration-200"
+                            title="View Details"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                        </Link>
+                      </div>
                     </div>
                   </motion.div>
                 );

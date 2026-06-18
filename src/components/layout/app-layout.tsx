@@ -1,7 +1,6 @@
 "use client";
 
 import { Sidebar } from "./sidebar";
-import { motion } from "framer-motion";
 import { Bell, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";

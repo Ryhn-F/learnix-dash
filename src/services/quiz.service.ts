@@ -6,7 +6,8 @@ export class QuizService {
     userId: string,
     topic: string,
     score: number,
-    questions: QuizQuestion[]
+    questions: QuizQuestion[],
+    userAnswers?: Record<number, string>
   ) {
     if (!hasSupabaseConfig) {
       console.warn("Supabase not configured. Quiz attempt will not be saved.");
@@ -29,12 +30,13 @@ export class QuizService {
     const quizId = attemptData.id;
 
     // Save questions
-    const questionInserts = questions.map((q) => ({
+    const questionInserts = questions.map((q, idx) => ({
       quiz_id: quizId,
       question: q.question,
       options: JSON.stringify(q.options),
       answer: q.answer,
       explanation: q.explanation,
+      user_answer: userAnswers?.[idx] ?? null,
     }));
 
     const { error: questionError } = await supabase
@@ -78,6 +80,39 @@ export class QuizService {
       averageScore: Math.round(averageScore),
       recentTopics,
       history,
+    };
+  }
+
+  static async getQuizAttemptById(quizId: string) {
+    if (!hasSupabaseConfig) {
+      return null;
+    }
+
+    const { data: attempt, error: attemptError } = await supabase
+      .from("quiz_attempts")
+      .select("*")
+      .eq("id", quizId)
+      .single();
+
+    if (attemptError) throw new Error(attemptError.message);
+    if (!attempt) return null;
+
+    const { data: questions, error: questionsError } = await supabase
+      .from("quiz_questions")
+      .select("*")
+      .eq("quiz_id", quizId);
+
+    if (questionsError) throw new Error(questionsError.message);
+
+    return {
+      ...attempt,
+      questions: (questions || []).map((q: any) => ({
+        question: q.question,
+        options: typeof q.options === "string" ? JSON.parse(q.options) : q.options,
+        answer: q.answer,
+        explanation: q.explanation,
+        user_answer: q.user_answer ?? null,
+      })),
     };
   }
 }

@@ -3,13 +3,13 @@ import { QuizService } from "@/services/quiz.service";
 
 export async function POST(request: Request) {
   try {
-    const { userId, topic, score, questions } = await request.json();
+    const { userId, topic, score, questions, userAnswers } = await request.json();
 
     if (!userId || !topic || typeof score !== "number" || !questions) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const quizId = await QuizService.saveQuizAttempt(userId, topic, score, questions);
+    const quizId = await QuizService.saveQuizAttempt(userId, topic, score, questions, userAnswers);
 
     return NextResponse.json({ success: true, quizId });
   } catch (error: any) {
